@@ -25,6 +25,7 @@ M.Control = L.Control.extend({
 		M.Mixin.Events.on('layerDeleted',    this._onLayerDeleted, this);
 		M.Mixin.Events.on('fileImported',    this._onFileImported, this);
 		M.Mixin.Events.on('fileDeleted',     this._onFileDeleted, this);
+		M.Mixin.Events.on('layerPointClick', this._onLayerPointClick, this);
 	},
 
 	_projectSelected : function (e) {
@@ -55,5 +56,6 @@ M.Control = L.Control.extend({
 	_onLayerStyleEdited   : function () {},
 	_onLayerDeleted  : function () {},
 	_off 		 	 : function () {},
+	_onLayerPointClick : function () {},
 
 });

@@ -30,8 +30,8 @@
     position: relative;
     width: 140px;
     margin: auto;
-    float: right;
-    margin-right: 20%;
+    /*float: right;*/
+    /*margin-right: 20%;*/
 }
 
 .smooth-fullscreen-save.update-style {

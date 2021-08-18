@@ -1393,6 +1393,12 @@ M.Chrome.Data = M.Chrome.extend({
             layer : layer
         });
 
+         // create name box
+        this._createTSZIndex({
+            container : content,
+            layer : layer
+        });
+
         // create OK button
         this._createTSOKButton({
             container : content,
@@ -2499,6 +2505,35 @@ M.Chrome.Data = M.Chrome.extend({
         return toggles_wrapper;
     },
 
+    _createTSZIndex : function (options) {
+        var container = options.container;
+        var layer = options.layer;
+
+        // are we editing?
+        var isEditing = _.isObject(layer);
+
+        var zindex_text = 'Ordering of layers (z-index)';
+        var zindex_description = 'Baselayers have z-index from 0. Data layers have z-index starting at 1000. To force a layer to display between Baselayers and Data layers, set the z-index to eg. 800.'
+        var zindex_placeholder = '800'
+        var zindex_value = layer ? layer.getCustomZIndex() : '';
+
+        // create divs
+        var toggles_wrapper = M.DomUtil.create('div', 'toggles-wrapper file-options', container);
+        var zindex = M.DomUtil.create('div', 'smooth-fullscreen-name-label clearboth', toggles_wrapper, zindex_text);
+        var description_div = M.DomUtil.create('div', 'input-description', toggles_wrapper, zindex_description);
+        var zindex_input = M.DomUtil.create('input', 'smooth-input smaller-input', toggles_wrapper);
+
+        zindex_input.setAttribute('placeholder', zindex_placeholder);
+        zindex_input.value = zindex_value;
+        var zindex_error = M.DomUtil.create('div', 'smooth-fullscreen-error-label', toggles_wrapper);
+
+        // save
+        this._fullscreen.ts_zindex_div = zindex_input;
+
+        // return wrapper
+        return toggles_wrapper;
+    },
+
     _createTSUrlBox : function (options) {
         var container = options.container;
         var layer = options.layer;
@@ -2580,6 +2615,7 @@ M.Chrome.Data = M.Chrome.extend({
             var layer_name = this._fullscreen.ts_name_div.value;
             var tile_url = this._fullscreen.ts_url_div.value;
             var subdomains = this._fullscreen.ts_subdomains_div.value;
+            var zindex = this._fullscreen.ts_zindex_div.value;
 
             if (layer) {
                 // editing 
@@ -2595,6 +2631,8 @@ M.Chrome.Data = M.Chrome.extend({
                 // layer.store.legend = legend_url;
                 // layer.save('legend');
 
+                layer.setCustomZIndex(zindex);
+
                 // select project
                 M.Mixin.Events.fire('layerEdited', { detail : {
                     projectUuid : app.activeProject.getUuid(),
@@ -2608,6 +2646,7 @@ M.Chrome.Data = M.Chrome.extend({
                     title  : layer_name,
                     tile_url    : tile_url,
                     subdomains  : subdomains,
+                    custom_zindex : zindex,
                     // title   : layer_name,
                     // legend  : legend_url
                 });
@@ -2643,6 +2682,7 @@ M.Chrome.Data = M.Chrome.extend({
             description : '',
             file : null,
             legend : options.legend,
+            custom_zindex : options.zindex
         };
 
         // create layer @ api
@@ -3418,8 +3458,6 @@ M.Chrome.Data = M.Chrome.extend({
             }]
         }
 
-        console.log('REMVOING DATASET FROM CUBE');
-        console.log('cube before :', layer.getCube());
 
         app.api.removeFromCube(options, function (err, updatedCube) {
             if (err) return console.error(err);
@@ -3427,16 +3465,12 @@ M.Chrome.Data = M.Chrome.extend({
             // parse cube
             var cube = M.parse(updatedCube);
 
-            console.log('CUBE AFTER #1: ', cube);
-
             if (cube) {
                 // update M.CubeLayer
                 var updatedLayer = layer._saveCube(cube);
             } else {
                 console.error('Error parsing cube:', updatedCube);
             }
-
-            console.log('CUBE AFTER #2', updatedLayer);
 
             // refresh list
             this._refreshCubeset(updatedLayer);
@@ -5215,7 +5249,8 @@ M.Chrome.Data = M.Chrome.extend({
                 delete : {
                     name : 'Delete',
                     disabled : !canEdit
-                }
+                },
+
             }
         }
 

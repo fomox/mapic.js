@@ -198,6 +198,8 @@ M.Popup.Chart = L.Control.extend({
 
 	_dragStart : function (e) {
 
+		if (e.which == 3) return; // right click
+
 		// get mouse pos offset in relation to popup
 		var popupPosition = {
 			x : this._container.offsetLeft,

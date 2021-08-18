@@ -615,6 +615,11 @@ M.VectorLayer = M.Model.Layer.extend({
         // pass layer
         e.layer = this;
 
+        // add event (for control.description legend toggle)
+        M.Mixin.Events.fire('layerPointClick', { detail : {
+            layer_id : e.layer.options.uuid
+        }});
+
         // fetch data
         this._fetchData(e, function (ctx, json) {
             
@@ -679,6 +684,8 @@ M.VectorLayer = M.Model.Layer.extend({
         path += '&access_token=' + app.tokens.access_token;
 
         console.log('_onDownloadReady', path);
+
+        app.feedback.msg('Download ready!', 'Click this link to <a href="' + path + '" target="_blank">download dataset</a>.', 20000);
 
         // open (note: some browsers will block pop-ups. todo: test browsers!)
         window.open(path, 'mywindow');

@@ -17,6 +17,9 @@ M.Styler.Point = M.Styler.extend({
 		// blend mode
 		this._createBlendMode();
 
+		// blend mode
+		this._createInterpolated();
+
 		// targets
 		this._createTargets();
 

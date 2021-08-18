@@ -129,7 +129,7 @@
 .file-action:hover:after {
     content: '';
     position: absolute;
-    width: 142px;
+    width: 142px !important;
     height: 100%;
     background: #EEE;
     left: -19px;
@@ -667,7 +667,7 @@ input.chrome-field-input {
     border-radius: 4px;
     box-shadow: none;
     /*max-height: 400px;*/
-    /*overflow-y: scroll;*/
+    overflow-y: hidden;
     }
 
 .description-control-content-box {
@@ -707,7 +707,7 @@ input.chrome-field-input {
     position: fixed;
     left: calc(50% - 100px);
     max-height: 200px;
-    pointer-events: none;
+    /*pointer-events: none;*/
 }
 
 

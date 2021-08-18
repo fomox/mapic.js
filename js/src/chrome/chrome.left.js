@@ -44,8 +44,8 @@ M.Chrome.Left = M.Chrome.extend({
 			});
 		}
 
-		// data tab
-		if (this.options.tabs.users) {
+		// data tab (disable for EDI)
+		if (this.options.tabs.users && window.location.host != 'maps.edinsights.no') {
 
 			// create settings selector
 			this._tabs.users = new M.Chrome.Users({

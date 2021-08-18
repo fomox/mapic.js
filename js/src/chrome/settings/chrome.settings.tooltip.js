@@ -317,12 +317,12 @@ M.Chrome.SettingsContent.Tooltip = M.Chrome.SettingsContent.extend({
         });     
 
         var timeSeriesSwitch = new M.button({
-            id      : 'enable',
+            id       : 'enable',
             type     : 'switch',
             isOn     : this.tooltipMeta.timeSeries.enable,
             right    : false,
             appendTo : timeSeriesLine.container,
-            fn   : this._saveSwitch.bind(this)
+            fn       : this._saveSwitch.bind(this)
         });
 
 
@@ -339,7 +339,7 @@ M.Chrome.SettingsContent.Tooltip = M.Chrome.SettingsContent.extend({
         });
 
         var rangeMiniInput = new M.button({
-            id      : 'minmaxRange',
+            id          : 'minmaxRange',
             type        : 'miniInput',
             right       : false,
             isOn        : true,
@@ -347,10 +347,32 @@ M.Chrome.SettingsContent.Tooltip = M.Chrome.SettingsContent.extend({
             value       : this.tooltipMeta.timeSeries.minmaxRange,
             placeholder : 'auto',
             tabindex    : 1,
-            fn      : this._saveMiniBlur.bind(this),
+            fn          : this._saveMiniBlur.bind(this),
             className   : 'time-series-input'
         });
 
+
+        // chart unit (mm, cm, m, etc)
+        var chartUnitLine = new M.fieldLine({
+            id       : 'chartUnit',
+            appendTo : sectionWrapper,
+            title    : 'Chart unit',
+            input    : false
+        });
+
+        var chartUnitInput = new M.button({
+            id          : 'chartUnit',
+            type        : 'miniInput',
+            right       : false,
+            isOn        : true,
+            appendTo    : chartUnitLine.container,
+            value       : this.tooltipMeta.chartUnit,
+            placeholder : 'mm',
+            tabindex    : 1,
+            fn          : this._saveMiniBlur.bind(this),
+            className   : 'time-series-input',
+            allowText   : true
+        });
 
 
         // Create list of time series fields
@@ -424,6 +446,14 @@ M.Chrome.SettingsContent.Tooltip = M.Chrome.SettingsContent.extend({
             
             // Update object
             this.tooltipMeta.timeSeries[key] = value;
+
+            // Save to server
+            this._layer.setTooltip(this.tooltipMeta);
+
+        } else if (key == 'chartUnit') {
+
+            // Update object
+            this.tooltipMeta.chartUnit = value;
 
             // Save to server
             this._layer.setTooltip(this.tooltipMeta);

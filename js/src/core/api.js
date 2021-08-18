@@ -119,6 +119,11 @@ M.Api = M.Class.extend({
 		this.post(path, options, done);
 	},
 
+	updateUsername: function (options, done) {
+		var path = '/v2/users/updateUsername';
+		this.post(path, options, done);
+	},
+
 	createUser: function (options, done) {
 		var path = '/v2/users/create';
 		this.post(path, options, done);

@@ -228,7 +228,23 @@ M.Model.Layer = M.Model.extend({
     _addToZIndex : function (type) {
         if (type == 'baselayer') this._isBase = true;
         var zx = this._zx || this._getZX();
-        this._isBase ? zx.b.add(this) : zx.l.add(this); // either base or layermenu
+
+        // add to baselayers
+        if (this._isBase) {
+            zx.b.add(this);
+            return;
+        } 
+        
+        var custom_zindex = this.getCustomZIndex();
+        if (custom_zindex) {
+            zx.b.addAt(this, 600);
+            return;
+        } 
+
+        // add to data layers
+        zx.l.add(this);
+        
+        // this._isBase ? zx.b.add(this) : zx.l.add(this); // either base or layermenu
     },
 
     _removeFromZIndex : function () {
@@ -757,6 +773,23 @@ M.Model.Layer = M.Model.extend({
 
     _onHoverEnabled : function () {},
     _onHoverDisabled : function () {},
+
+    getCustomZIndex : function () {
+        var z = parseInt(this.store.custom_zindex);
+        if (_.isNaN(z)) return '';
+        return z;
+    },
+
+    setCustomZIndex : function (zidx) {
+        try {
+        this.store.custom_zindex = parseInt(zidx);
+        this.save('custom_zindex');
+        } catch (e) {
+            console.log('parseInt err:', e, zidx);
+        }
+    }
+
+
 });
 
 

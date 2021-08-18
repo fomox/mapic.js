@@ -60,14 +60,14 @@ M.Chrome.SettingsContent.Styler = M.Chrome.SettingsContent.extend({
 		this._buttonWrapper = M.DomUtil.create('div', 'button-wrapper displayNone', this._container);
 		this._updateStyleButton = M.DomUtil.create('div', 'smooth-fullscreen-save update-style', this._buttonWrapper, 'Update Style');
 
-		this._preRenderButton = M.DomUtil.create('div', 'smooth-fullscreen-save pre-render', this._buttonWrapper, 'Pre-render');
+		// this._preRenderButton = M.DomUtil.create('div', 'smooth-fullscreen-save pre-render', this._buttonWrapper, 'Pre-render');
 
 		// Event for click button
 		M.DomEvent.on(this._updateStyleButton, 'click', this._updateStyle, this);		
-		M.DomEvent.on(this._preRenderButton, 'click', this._preRender, this);		
+		// M.DomEvent.on(this._preRenderButton, 'click', this._preRender, this);		
 
 		// Ability to save styling as a template
-		this._initTemplateContent();
+		// this._initTemplateContent();
 
 		// Mark inited
 		this._inited = true;
@@ -82,8 +82,6 @@ M.Chrome.SettingsContent.Styler = M.Chrome.SettingsContent.extend({
 			// dry_run : true // debug
 		}, function (err, results) {
 			var res = M.parse(results);
-
-			console.log('render res:', res);
 
 			// give feedback on error
 			if (res.error) {
@@ -597,8 +595,6 @@ M.Chrome.SettingsContent.Styler = M.Chrome.SettingsContent.extend({
 	},
 
 	_updateVector : function (newLegend) {
-
-		console.error('_updateVector', newLegend);
 
 		// Update point
 		if (this._pointStyler) {

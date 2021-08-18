@@ -91,6 +91,10 @@ L.Control.Description = M.Control.extend({
         this._listeners();
     },
 
+    _onLayerPointClick : function (layer_id) {
+        this._toggleLegend(layer_id);
+    },
+
     _addHooks : function () {
         
         var isMobile = L.Browser.mobile;
@@ -418,6 +422,12 @@ L.Control.Description = M.Control.extend({
         }
 
         this._calculateHeight();
+    },
+
+    _toggleLegend : function (e) {
+        var layer_id = e.detail.layer_id;
+        this.setHTMLfromStore(layer_id);
+        this.updateMultiple(layer_id);    
     },
 
     toggleLegend : function (e) {   

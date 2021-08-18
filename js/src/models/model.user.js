@@ -187,6 +187,25 @@ M.User = M.Class.extend({
 		this.save('local.email');
 	},
 
+	setUsername : function (value) {
+
+		// set fields
+		var changes = {
+			username : value,
+			uuid : this.store.uuid
+		};
+
+
+		app.api.updateUsername(changes, function (err, result) {
+			if (err) console.error('err', err);
+
+			var parsed = M.parse(result);
+			console.log('result: ', parsed);
+
+		}.bind(this));
+
+	},
+
 
 	setKey : function (key, value) {
 		if (key == 'lastName' ) return this.setLastName(value);

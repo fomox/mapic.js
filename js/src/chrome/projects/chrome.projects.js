@@ -32,6 +32,16 @@ M.Chrome.Projects = M.Chrome.extend({
 	_initContainer : function () {
 		this._container = M.DomUtil.create('div', 'chrome-left-section chrome-projects', this.options.appendTo);
 	},
+
+	_allowCreateProject : function () {
+		// only allow supers on EDI to create project
+		if (window.location.host == 'maps.edinsights.no') {
+			return app.Account.isSuper();
+		}
+
+		// otherwise allow like before
+		return true;
+	},
 	
 	_initContent : function () {
 
@@ -42,11 +52,16 @@ M.Chrome.Projects = M.Chrome.extend({
 		var title = 'Projects <span style="font-weight:400; font-size: 16px; color: gainsboro">(' + _.size(app.Projects) + ')</span> ';
 		var projectsTitle = M.DomUtil.create('div', 'chrome-left-title projects-title', projectsContainer, title);
 
-		// Create NEW button
-		var newProjectButton = M.DomUtil.create('div', 'chrome-left-new-button', projectsContainer, '+');
+		// only allow for certain users
+		if (this._allowCreateProject()) {
 
-		// new trigger
-		M.DomEvent.on(newProjectButton, 'click', this._openNewProjectFullscreen, this);
+			// Create NEW button
+			var newProjectButton = M.DomUtil.create('div', 'chrome-left-new-button', projectsContainer, '+');
+
+			// new trigger
+			M.DomEvent.on(newProjectButton, 'click', this._openNewProjectFullscreen, this);
+
+		}
 
 		// save divs
 		this._projects = {};

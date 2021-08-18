@@ -60,12 +60,15 @@ M.FeedbackPane = M.Class.extend({
 		});
 	},
 
-	msg : function (title, description) {
+	msg : function (title, description, clearDelay) {
 		this.setMessage({
 			title : title, 
-			description : description
+			description : description,
+			clearDelay : clearDelay || 5000
 		});
 	},
+
+
 
 	add : function (message, severity) {
 
@@ -104,8 +107,8 @@ M.FeedbackPane = M.Class.extend({
 	// Check if message boxes overflow container, and remove the oldest message if it does
 	checkOverflow : function() {
 		var containerMaxHeight  = 700;
-		var innerHeight 	= this._innerWrapper.offsetHeight;
-		var diff 		= containerMaxHeight - 100 - innerHeight;
+		var innerHeight 		= this._innerWrapper.offsetHeight;
+		var diff 				= containerMaxHeight - 100 - innerHeight;
 		
 		if (diff < 0) {
 			var remId = this._messagesArray[0].options.id;

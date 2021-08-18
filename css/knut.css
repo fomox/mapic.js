@@ -3685,14 +3685,14 @@ input#geojson-upload {
     color: #999;
     font-style: italic; 
 }
-.c3-footer:after {
+/*.c3-footer:after {
     content: 'mm';
     position: absolute;
     color: #999;
     left: 9px;
     top: 0px;
     font-size: 11px;
-}    
+}   */ 
 .c3-footer-dates {
     color: #4a4a4a;
 }
@@ -3707,4 +3707,20 @@ input#geojson-upload {
 
 .c3-header-layer-name {
     overflow-wrap: anywhere;
+
+}
+.chart-unit-label {
+    color: #515151;
+    position: absolute;
+    font-size: 11px;
+    top: -14px;
+    left: 16px;
+}
+
+.description-multiple-toggle-wrapper {
+    display: none;
+}
+.input-description {
+    padding: 4px;
+    margin-bottom: 6px;
 }

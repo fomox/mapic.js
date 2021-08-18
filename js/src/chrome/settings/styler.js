@@ -293,6 +293,98 @@ M.Styler = M.Class.extend({
 		};
 	},
 
+	// create color box
+	_createInterpolated : function () {
+
+		// create color field
+		this.carto().interpolated = this.carto().interpolated || {};
+
+		// get states
+		var isOn         = (this.carto().interpolated.column === false);
+		// var staticVal    = this.carto().color.staticVal || this.options.defaults.color;
+		// var val          = this.carto().color.value 	|| this.options.defaults.range;
+		var column       = this.carto().interpolated.column;
+		// var minMax       = this.carto().color.range;
+
+		// container
+		var line = new M.fieldLine({
+			id           : 'interpolated',
+			appendTo     : this._wrapper,
+			title        : '<b>Interpolated</b>',
+			input        : false,
+			childWrapper : 'point-size-children' // todo: make class for polyugon?
+		});	
+
+		console.log('this.options.meta', this.options.meta);
+
+		// dropdown
+		var dropdown = new M.button({
+			id 	 	 : 'interpolated',
+			type 	 : 'dropdown',
+			isOn 	 : isOn,
+			right 	 : true,
+			appendTo : line.container,
+			fn 	 	 : this._dropdownSelected.bind(this),
+			array 	 : this._filterMeta(this.options.meta), // columns in dropdown
+			selected : column // preselected item
+		});
+
+		// // color ball
+		// var ball = new M.button({
+		// 	id 	 	 : 'color',
+		// 	type 	 : 'colorball',
+		// 	right    : true,
+		// 	isOn 	 : isOn,
+		// 	appendTo : line.container,
+		// 	fn       : this._updateColor.bind(this),
+		// 	value    : staticVal,
+		// 	colors   : this.options.palettes,
+		// 	className: 'target-color-box'
+		// });
+
+		// remember items
+		this._content[this.type].interpolated = {
+			line : line,
+			dropdown : dropdown,
+			// ball : ball
+		};
+
+		// save carto
+		this.carto().interpolated = {
+			column 	     : column,
+			// range 	     : minMax,
+			// staticVal    : staticVal,
+			// value 	     : val
+		};
+	},
+
+	_filterMeta : function (meta) {
+
+		var filtered = [];
+
+		_.forEach(meta, function (m) {
+
+			if (m == 'Fixed value') {
+				filtered.push('Disabled');
+			
+			} else {
+
+
+				// skip numbers
+				var n = parseInt(m);
+				if (isNaN(n)) {
+					filtered.push(m);
+				}
+
+			}
+
+
+		});
+
+		return filtered;
+
+	},
+
 	// create opacity box
 	_createOpacity : function () {
 
@@ -401,6 +493,8 @@ M.Styler = M.Class.extend({
 		// mark changed
 		this.markChanged();
 	},
+
+
 
 	// point size box
 	_createPointsize : function () {

@@ -464,6 +464,7 @@ M.Chart = M.Control.extend({
         // resize fonts
         // fix font sizes
         var _header = app._resize_chart_header;
+        if (!_header) return;
         var zoom;
         var fontSize;
 
@@ -506,10 +507,12 @@ M.Chart = M.Control.extend({
         var chart_y = new_y - new_header_height;
 
         // do the actual update
-        this._chart.resize({
-            height : chart_y, 
-            width : chart_x
-        });
+        if (this._chart) {
+            this._chart.resize({
+                height : chart_y, 
+                width : chart_x
+            });
+        }
 
         // remember
         app._rememberChartSizeHeight = new_y;
@@ -543,6 +546,17 @@ M.Chart = M.Control.extend({
 
     },
 
+    _getChartUnit : function (layer) {
+        try {
+            var tooltip = layer.store.tooltip;
+            var parsed = M.parse(tooltip);
+            var chartUnit = parsed.chartUnit;
+            if (chartUnit) return chartUnit;
+            return 'mm'; // default
+        } catch (e) {
+            return 'mm'; // default
+        }
+    },
 
     singleC3PopUp : function (e) {
 
@@ -591,6 +605,11 @@ M.Chart = M.Control.extend({
         content.appendChild(_chartContainer);
         content.appendChild(_footer);
 
+        // create chart unit label
+        var chartUnitLabel = M.DomUtil.create('div', 'chart-unit-label');
+        chartUnitLabel.innerHTML = this._getChartUnit(e.layer)
+        _footer.appendChild(chartUnitLabel);
+
         // Create graph HTML
         if ( this.popupSettings && this.popupSettings.timeSeries.enable != false) {
             
@@ -605,6 +624,7 @@ M.Chart = M.Control.extend({
             
             // on resize start
             M.DomEvent.on(resizeButton, 'mousedown', function (e) {
+                if (e.which == 3) return; // ignore right click
 
                 var start_x = e.pageX;
                 var start_y = e.pageY;
@@ -785,10 +805,12 @@ M.Chart = M.Control.extend({
             layer       : _layer
         };
 
-        var content = M.DomUtil.create('div', 'popup-inner-content');
+        var content = M.DomUtil.create('div', 'popup-inner-content visibility-hidden');
+
+        app._popup_content_div = content;
 
         // Create header
-        var _header = this.createHeader(headerOptions);
+        var _header = app._resize_chart_header = this.createHeader(headerOptions);
         var _chartContainer = this.createChartContainer();
         var _footer = this.createFooter();
         content.appendChild(_header);
@@ -803,9 +825,43 @@ M.Chart = M.Control.extend({
             var _chartTicks = this.chartTicks(this._c3Obj);
             _chartContainer.appendChild(_chart);
 
-        }
+            // resizable
+            var resizeButton = M.DomUtil.create('div', 'resize-chart-button');
+            resizeButton.innerHTML = '<i class="fa fa-expand"></i>';
+            _chartContainer.appendChild(resizeButton);
+            
+            // on resize start
+            M.DomEvent.on(resizeButton, 'mousedown', function (e) {
+                if (e.which == 3) return; // ignore right click
 
-        
+                var start_x = e.pageX;
+                var start_y = e.pageY;
+
+                var start_size_x = this._popup._wrapper.offsetWidth;
+                var start_size_y = this._popup._wrapper.offsetHeight;
+
+                app._chart_resize = {
+                    start_x,
+                    start_y, 
+                    start_size_x,
+                    start_size_y,
+                };
+
+                // create ghost fullscreen
+                app._chart_ghost = M.DomUtil.create('div', 'resize-ghost-fullscreen');
+                app._appPane.appendChild(app._chart_ghost); // add 
+               
+                // add event listener for mouseup
+                M.DomEvent.on(document, 'mouseup', this._remove_chart_ghost, this);
+
+                // resize move
+                M.DomEvent.on(app._chart_ghost, 'mousemove', _.throttle(this._resize_chart_fn.bind(this), 20), this);
+                
+            }.bind(this));
+
+            setTimeout(this._resize_chart_update_size.bind(this), 20);
+
+        }
 
         return content;
     },      
@@ -930,7 +986,6 @@ M.Chart = M.Control.extend({
             }
 
 
-
             if ( _val && _val != -9999) {
                 var metaPair = M.DomUtil.create('div', 'tableRow c3-header-metapair metapair-' + c, container);
                 var metaKey = M.DomUtil.create('div', 'tableCell c3-header-metakey', metaPair, title);
@@ -979,19 +1034,29 @@ M.Chart = M.Control.extend({
         var range;
 
         var settingsRange = c3Obj.popupSettings.timeSeries.minmaxRange;
-    
+
         // Use range from settings
         if ( settingsRange ) {
     
-            range = parseInt(settingsRange);
+            // range = parseInt(settingsRange);
+            range = parseFloat(settingsRange);
     
         // Use dynamic range based on current point
         } else {
+
         
-            if ( minY < 0 ) {
+            if (minY < 0) {
+                
                 var convertedMinY = Math.abs(minY);
-                if ( convertedMinY > maxY )     range = convertedMinY;
-                else                range = maxY;
+
+
+                if (convertedMinY > maxY) {
+                    range = convertedMinY;
+                } else {
+                    range = maxY;
+                }
+
+
             } else {
                 range = Math.floor(maxY * 100) / 100;
             }
@@ -1025,6 +1090,50 @@ M.Chart = M.Control.extend({
         } else {
             var _width = 400;
         }   
+
+        // helper fns
+        var tooltip_interpolation_parser = function (color, d) {
+            var defaultColor = '#0000FF';
+            var red = false;
+            
+            // only for edi
+            if (!_.includes(location.host, 'maps.edinsights.no')) {
+                return defaultColor;
+            }
+            
+            try {
+
+                // hacky interpolation coloring scheme
+                var a = _.toString(d.value);
+                if (_.isEmpty(a)) return defaultColor;
+                var i = _.includes(a, '00001');
+                if (i) red = true;
+
+                // second method, looking for when second decicmal is a 1
+                var b = a.split('.');
+                var c = b[1];
+                if (_.isUndefined(c)) return defaultColor;
+                var d = c.charAt(1);
+                if (d == '1') red = true;
+
+                // return color
+                if (red) return 'red';
+                return defaultColor;
+
+            } catch (e) {
+                return defaultColor;
+            }
+        }
+
+        // helper fn
+        var tooltip_html_parser = function (data) {
+            var d = data[0];
+            var tooltip_value = d.value;
+            var tooltip_title = moment(d).format("DD.MM.YYYY");
+            var tooltip_value_color = tooltip_interpolation_parser(null, d);
+            var tooltip_html = '<table class="c3-tooltip"><tbody><tr><th colspan="2">' + tooltip_title + '</th></tr><tr class="c3-tooltip-name--mm"><td class="name"><span style="background-color:' + tooltip_value_color + '"></span>mm</td><td class="value">' + tooltip_value + '</td></tr></tbody></table>';
+            return tooltip_html;
+        }
 
         // CHART SETTINGS
         var chartSettings = {
@@ -1072,15 +1181,7 @@ M.Chart = M.Control.extend({
                     mm : 'scatter',
                     regression : 'line'
                 },
-                color : function (color, d) {
-
-                    // hacky interpolation coloring scheme
-                    var a = _.toString(d.value)
-                    var i = _.includes(a, '00001');
-
-                    // return red or default color                 
-                    return i ? 'red' : '#0000FF';
-                }
+                color : tooltip_interpolation_parser,
             },
 
             axis: {
@@ -1099,18 +1200,32 @@ M.Chart = M.Control.extend({
                     max : range,
                     min : -range,
                     tick: {
-                        format: function (d) { return Math.floor(d * 100)/100}
+                        format: function (d) { 
+                            // return d;
+                            // console.log('d', d);
+                            var f = (Math.floor(d * 100) / 100);
+                            // console.log('f:', f);
+                            return f;
+                        }
                     }
                 }
             },
 
             tooltip: {
                 grouped : true,
-                format: {
-                    title: function (d) { 
-                        var nnDate = moment(d).format("DD.MM.YYYY");
-                        return nnDate;
-                    }
+                // format: {
+                //     title: function (d) { 
+                //         var nnDate = moment(d).format("DD.MM.YYYY");
+                //         return nnDate;
+                //     }
+                // }
+                contents : function (data) {
+                    var d = data[0];
+                    var tooltip_value = d.value;
+                    var tooltip_title = moment(d.x).format("DD.MM.YYYY");
+                    var tooltip_value_color = tooltip_interpolation_parser(null, d);
+                    var tooltip_html = '<table class="c3-tooltip"><tbody><tr><th colspan="2">' + tooltip_title + '</th></tr><tr class="c3-tooltip-name--mm"><td class="name"><span style="background-color:' + tooltip_value_color + '"></span>mm</td><td class="value">' + tooltip_value + '</td></tr></tbody></table>';
+                    return tooltip_html;
                 }
                 
             },
@@ -1119,6 +1234,8 @@ M.Chart = M.Control.extend({
                 pattern: ['#000000']
             }               
         };
+
+        // create chart
         var chart = this._chart = c3.generate(chartSettings);
 
         // add zoom events
@@ -1132,6 +1249,8 @@ M.Chart = M.Control.extend({
 
         return _C3Container;
     },
+
+
 
     _addCSVButton : function () {
         var button = M.DomUtil.create('div', 'csv-button-wrapper', this._footerContainer, 'Export as CSV');

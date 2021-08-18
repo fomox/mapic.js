@@ -21,7 +21,7 @@ M.ZIndexControl = M.Class.extend({
 	},
 
 	addAt : function (layer, zindex) {
-		
+		this.set(zindex, layer);
 	},
 
 	remove : function (layer) {
