@@ -1703,9 +1703,12 @@ M.Tools.Legend = {
 		var satelliteView = stylerObject.satelliteView;
 		var layer = stylerObject.options.layer;
 
-		var gradident_footer_left = object.left_footer;
-		var gradident_footer_right = object.right_footer;
+		var gradident_footer_left = object.left_footer || '';
+		var gradident_footer_right = object.right_footer || '';
 
+		if (_.includes(window.location.host, 'ngi.no')) {
+			gradientName = 'mean velocity per year in mm';
+		}
 		// var gradientName = layer.getStyleJSON().legendScaleTitle || 'mean velocity per year in mm';
 
 		// HTML PART

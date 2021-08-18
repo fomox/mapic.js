@@ -667,7 +667,7 @@ input.chrome-field-input {
     border-radius: 4px;
     box-shadow: none;
     /*max-height: 400px;*/
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
     }
 
 .description-control-content-box {
@@ -1297,8 +1297,9 @@ input.chrome-field-input {
     color: #666;
     top: 2px;
     position: relative;
-    /*padding-bottom: 5px; */
+    padding-bottom: 5px; 
 /*    margin-top: 15px;   */
+    overflow-wrap: break-word;
 }
 
 

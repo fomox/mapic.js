@@ -3699,3 +3699,12 @@ input#geojson-upload {
 .regression-button-wrapper {
     top: 0px;
 }
+
+#c3-container {
+    margin-bottom: 40px;
+}
+
+
+.c3-header-layer-name {
+    overflow-wrap: anywhere;
+}
