@@ -2056,7 +2056,7 @@ a.login-forgot-link {
     font: 13px sans-serif;
 }
 g.axis.x {
-    fill: white;
+    fill: black;
 }
 g.axis.y {
     fill: white;
@@ -2067,13 +2067,9 @@ g.axis.y {
     padding-right: 0px;
     position: absolute;
     right: 100px;
-    /*bottom: 45px !important;*/
     border-radius: 0;
-    /* opacity: 0; */
     color: white;
     opacity: 0.9 !important;
-    /*right: 10px !important;*/
-    /*bottom: 35px !important;*/
     border-radius: 5px 5px 0 0 !important;
 }
 

@@ -741,6 +741,7 @@ input.chrome-field-input {
 
 .c3-header-wrapper {
     overflow: hidden;
+    max-width:  20000px;
     }
 
 .leflet-container.leaflet-popup.tiny-pop-up {
