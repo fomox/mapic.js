@@ -315,8 +315,6 @@ M.Styler = M.Class.extend({
 			childWrapper : 'point-size-children' // todo: make class for polyugon?
 		});	
 
-		console.log('this.options.meta', this.options.meta);
-
 		// dropdown
 		var dropdown = new M.button({
 			id 	 	 : 'interpolated',

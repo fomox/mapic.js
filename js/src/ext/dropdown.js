@@ -142,6 +142,11 @@ M.Dropdown = M.Class.extend({
 
 	setValue: function (selectOption) {
 
+		this._setValue(selectOption);
+		this.options.fn(selectOption.value);
+	},
+
+	_setValue : function (selectOption) {
 		this._form_combobox_input.setAttribute('data-value', selectOption.value);
 		this._form_combobox_input.innerHTML = selectOption.title;
 
@@ -152,7 +157,6 @@ M.Dropdown = M.Class.extend({
 		this._selectOption = document.getElementById(selectOption.value);
 		M.DomUtil.addClass(this._selectOption, 'hover');
 		this._hoverItem = this._selectOption;
-		this.options.fn(selectOption.value);
 	},
 
 	_optionHover: function (e) {

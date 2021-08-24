@@ -232,7 +232,8 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 
 		// get uuid
 		var layerUuid = uuid || value;
-		
+
+
 		// Store uuid of layer we're working with
 		this._storeActiveLayerUuid(layerUuid);
 
@@ -325,13 +326,25 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 
 		// Enable settings from layer we're working with
 		var layerUuid = this._getActiveLayerUuid();
-		if (layerUuid) this._selectedActiveLayer(false, layerUuid);		
+		if (layerUuid) {
 
-		// Select layer we're working on
-		var options = this.layerSelector.childNodes;
-		for (var k in options) {
-			if (options[k].value == layerUuid) options[k].selected = true;
+			this._selectedActiveLayer(false, layerUuid);	
+
+			// set index in dropdown
+			this.layerSelector._setValue({
+				value : layerUuid, 
+				title : this._getLayerTitleFromUuid(layerUuid)
+			});
 		}
+
+	},
+
+	_getLayerTitleFromUuid : function (uuid) {
+		var title = _.find(this.layerSelector.options.content, function (c) {
+			return c.value == uuid;
+		});
+		if (title) return title.title;
+		return '';
 	},
 
 	_showEditors : function () {
@@ -449,15 +462,9 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		this._createFilterChart(column);
 
 		// set index in dropdown
-		this._select.selectedIndex = this._getDropdownIndex(column);
+		this._layerFiltersDropDown._setValue({value : column, title : column});
 	},
 
-	_getDropdownIndex : function (column) {
-		for (var i = 0; i < this._select.length; i++) {
-			if (this._select.options[i].value == column) return i;
-		}
-		return 0;
-	},
 
 	_selectedFilterColumn : function (value) {
 		this._createFilterChart(value);
@@ -551,7 +558,7 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		    .gap(2)
 		    .x(d3.scale.linear().domain([0, num_buckets]))
 		    .brushOn(true) // drag filter
-		    .renderLabel(true)
+		    // .renderLabel(true)
 		    .dimension(runDimension)
 		    .group(speedSumGroup)
 		    .elasticX(true)
@@ -561,14 +568,10 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		// filter event (throttled)
 		this._chart.on('filtered', function (chart, filter) {
 
-			console.log('filtered: ', chart, filter);
-
 			if (!filter) return this._registerFilter(false);
 
 			// round buckets
 			var buckets = [Math.round(filter[0]), Math.round(filter[1])];
-
-			console.log('buckets', buckets);
 
 			// apply sql filter, create new layer, etc.
 			this._registerFilter(column, buckets, histogram);
@@ -578,6 +581,7 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		// set y axis tick values
 		var ytickValues = this._getYAxisTicks(histogram);
 		this._chart.yAxis().tickValues(ytickValues);
+		this._chart.yAxis().ticks(10);
 
 		// prettier y-axis
 		this._chart.yAxis().tickFormat(function(v) {
@@ -601,6 +605,7 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		this._chart.renderlet(function (chart) {
 			this._chart.select('.brush').on('mousedown', this._onBrushMousedown.bind(this));
 		}.bind(this));
+
 	},
 
 	_onBrushMousedown : function (e) {
@@ -635,7 +640,8 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 
 		// filter, redraw
 		this._chart.filter([c.bucket_min, c.bucket_max]);
-		this._chart.redraw();
+		this._chart.render();
+		
 	},
 
 	_getYAxisTicks : function (histogram) {
@@ -644,8 +650,6 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		});
 
 		var max = m.freq;
-
-		console.log('_getYAxisTicks', histogram, m, max);
 
 		// five ticks
 		var num_ticks = 3;
@@ -680,7 +684,6 @@ M.Chrome.SettingsContent.Filters = M.Chrome.SettingsContent.extend({
 		function nearest(n, v) {
 			n = n / v;
 			n = Math.ceil(n) * v;
-			console.log('nearest: ', n);
 			return n;
 		}
 

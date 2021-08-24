@@ -153,7 +153,7 @@ M.Chrome.SettingsContent = M.Chrome.extend({
 	},
 
 	_getActiveLayerUuid : function () {
-		return app.Chrome.Right.options.editingLayer
+		return app.Chrome.Right.options.editingLayer;
 	},
 
 	opened : function () {

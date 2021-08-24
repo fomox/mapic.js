@@ -80,11 +80,19 @@ M.VectorLayer = M.Model.Layer.extend({
     },
 
     _refreshLayer : function (layerUuid) {
+
+        // refresh layer
         this.layer.setOptions({
             layerUuid : layerUuid
         });
-
         this.layer.redraw();
+
+        // refresh grid layer
+        this.gridLayer.setOptions({
+            layerUuid : layerUuid
+        });
+        this.gridLayer.redraw();
+
     },
 
     _getLayerUuid : function () {
