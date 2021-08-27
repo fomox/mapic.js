@@ -290,8 +290,11 @@ M.Chrome.Users = M.Chrome.extend({
 
 		// this._access[options.type]
 		var options = {
-			access : access
+			access : access,
+			user : app.Account.getUuid()
 		};
+
+		console.log('options', options);
 
 		// create share link
 		app.api.inviteLink(options, function (err, response) {

@@ -161,7 +161,8 @@ M.Api = M.Class.extend({
 
 	inviteLink : function (options, done) {
 		var path = '/v2/users/invite/link';
-		this.get(path, options, done);
+		// this.get(path, options, done);
+		this.post(path, options, done);
 	},
 
 	acceptInvite : function (options, done) {
