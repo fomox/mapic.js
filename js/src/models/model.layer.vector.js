@@ -301,7 +301,7 @@ M.VectorLayer = M.Model.Layer.extend({
             useJsonP: false,
             subdomains: subdomains,
             maxRequests : 0,
-            requestTimeout : 10000,
+            requestTimeout : 120000,
             layerUuid : layerUuid,
             maxZoom : 19
         });

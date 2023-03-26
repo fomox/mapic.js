@@ -51,7 +51,7 @@ M.App = M.Class.extend({
 
 		} else {
 
-			document.title = app.options.portalTitle;
+			document.title = 'NGI | Insarkart'
 
 		}
 
