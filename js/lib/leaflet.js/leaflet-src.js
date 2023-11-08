@@ -11582,10 +11582,39 @@ var TileLayer = GridLayer.extend({
         */
         tile.setAttribute('role', 'presentation');
 
+        tile.onerror = () => {
+            // first attempt
+            if (!_.includes(tile.src, '&retries=')) {
+
+                var url = tile.src + '&retries=1'
+                console.log('Retrying tile...', url)
+                setTimeout(function () {
+                    tile.src = url
+                }, 100)
+                return;
+            }
+
+            if (_.includes(tile.src, '&retries=1')) {
+
+                var url = tile.src.split('&retries=1')[0] + '&retries=2'
+                console.log('Retrying tile again...', url)
+
+                setTimeout(function () {
+                    tile.src = url 
+                }, 300)
+                return;
+            }
+
+            console.log('Second failed attempt, no more retries.')
+        }
+        
+            
+
         tile.src = this.getTileUrl(coords);
 
         return tile;
     },
+
 
     // @section Extension methods
     // @uninheritable
